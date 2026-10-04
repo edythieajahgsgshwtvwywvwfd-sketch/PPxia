@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>认清 CubeMX 根目录与 Keil 子工程</title>
+  <link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body><main>
+  <h1>认清 CubeMX 根目录与 Keil 子工程</h1>
+  <p class="lead">本节的目标：修改任何文件前，先判断它属于“硬件生成层”还是“业务代码层”。</p>
+
+  <h2>它们不是两个项目</h2>
+  <pre>E:\32\clion_stm32\jishe_new3_6-12Mhz - new - 3\
+├─ water.ioc          ← CubeMX 配置真源
+├─ Core\              ← CubeMX 生成
+├─ Drivers\           ← ST 官方驱动
+└─ MDK-ARM\
+   ├─ water.uvprojx   ← Keil 构建真源
+   ├─ hardware\       ← 你的业务代码
+   ├─ NVIC\           ← 你的通信/调度代码
+   └─ system\         ← 你的全局状态和基础代码</pre>
+
+  <p>当 VS Code 打开 <code>MDK-ARM</code> 时，标签中的 <code>hardware/APP_MAIN.c</code> 实际就是完整路径里的 <code>MDK-ARM/hardware/APP_MAIN.c</code>，并没有第二份文件。</p>
+
+  <h2>最稳妥的编辑规则</h2>
+  <div class="grid">
+    <section class="card safe"><strong>可直接编辑</strong><p>hardware、NVIC、system 下的自定义文件。</p></section>
+    <section class="card warn"><strong>通过 CubeMX 修改</strong><p>引脚、时钟、DMA、NVIC、TIM、UART 等生成配置。</p></section>
+  </div>
+  <p>如果必须在 CubeMX 生成文件里加代码，只能放进已有的 <code>/* USER CODE BEGIN ... */</code> 与 <code>/* USER CODE END ... */</code> 之间。ST 明确说明其他位置会在重新生成时被覆盖。</p>
+
+  <h2>推荐工作方式</h2>
+  <ol>
+    <li>VS Code 打开完整父目录。</li>
+    <li>在 Keil Assistant 中点击“打开项目”，选择 <code>MDK-ARM/water.uvprojx</code>。</li>
+    <li>关闭 CMake 自动配置，避免当前不完整的 CMake 清单干扰。</li>
+    <li>日常编译和下载仍走 Keil Assistant；修改硬件才打开 <code>water.ioc</code>。</li>
+  </ol>
+
+  <h2>一分钟自检</h2>
+  <details><summary>问题：需要把 UART4 波特率从 115200 改为 57600，应该先改哪个文件？</summary><p>先改父目录的 <code>water.ioc</code>，再由 CubeMX 重新生成。不要只改 <code>Core/Src/usart.c</code>，否则下次生成会丢失。</p></details>
+  <details><summary>问题：新增一个机械动作状态机，应该放在哪里？</summary><p>放在 <code>MDK-ARM/hardware</code> 的自定义文件中，再把该源文件加入 <code>water.uvprojx</code>；不要把大量业务逻辑堆进生成的 <code>main.c</code>。</p></details>
+
+  <h2>实践反馈回路</h2>
+  <p>下一次改 CubeMX 前先提交/备份；生成后查看变化；在 Keil Assistant 中 Rebuild；确认 0 error；最后下载验证。任何一步异常都先停止，不要连续生成多次。</p>
+
+  <p>主资料：<a href="https://dev.st.com/stm32cube-docs/stm32cube-getting-started/1.1.2/en/markup/Ecosystem_Dev_YourApp/Ecosystem_Dev_WithSTTools.html">ST 官方 CubeMX 与 IDE 工作流</a>。速查页：<a href="../reference/cubemx-keil-workflow.html">CubeMX + Keil Assistant 工作流速查</a>。</p>
+  <p>有任何一步不清楚，可以继续向我提问，并把 CubeMX 生成后的文件变化或 Keil 编译输出贴出来。</p>
+</main></body>
+</html>

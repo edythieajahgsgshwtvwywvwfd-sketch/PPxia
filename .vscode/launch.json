@@ -1,0 +1,40 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Build (only compile)",
+      "type": "pwa-node",
+      "request": "launch",
+      "noDebug": true,
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "cmd.exe",
+      "runtimeArgs": ["/d", "/c", "cmake --fresh --preset Debug && cmake --build --preset Debug --parallel 10"]
+    },
+    {
+      "name": "Run (build + flash, no debug)",
+      "type": "pwa-node",
+      "request": "launch",
+      "noDebug": true,
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "cmd.exe",
+      "runtimeArgs": [
+        "/d",
+        "/c",
+        "cmake --fresh --preset Debug && cmake --build --preset Debug --parallel 10 && call .\\run_flash.cmd"
+      ]
+    },
+    {
+      "name": "Debug (OpenOCD + DAPLink)",
+      "type": "cortex-debug",
+      "request": "launch",
+      "servertype": "openocd",
+      "cwd": "${workspaceFolder}",
+      "executable": "${workspaceFolder}/build/Debug/water.elf",
+      "runToEntryPoint": "main",
+      "openOCDPath": "C:\\Users\\32455\\Desktop\\daplink\\dap\\openocd-20240916\\OpenOCD-20240916-0.12.0\\bin\\openocd.exe",
+      "configFiles": ["C:\\Users\\32455\\Desktop\\daplink\\dap\\daplink.cfg"],
+      "openOCDLaunchCommands": ["init", "reset halt"],
+      "postLaunchCommands": ["monitor reset halt"]
+    }
+  ]
+}

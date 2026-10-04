@@ -1,0 +1,16 @@
+{
+  "cmake.configureOnOpen": true,
+  "cmake.useCMakePresets": "always",
+  "cmake.statusbar.advanced": {
+    "configure": true,
+    "build": true,
+    "ctest": false,
+    "debug": false,
+    "launch": false
+  },
+  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+  "files.associations": {
+    "launch.json": "json",
+    "tasks.json": "json"
+  }
+}

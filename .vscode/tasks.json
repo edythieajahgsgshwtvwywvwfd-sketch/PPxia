@@ -1,0 +1,72 @@
+{
+  "version": "2.0.0",
+  "options": {
+    "cwd": "${workspaceFolder}",
+    "shell": {
+      "executable": "cmd.exe",
+      "args": ["/d", "/c"]
+    }
+  },
+  "tasks": [
+    {
+      "label": "Clean (delete build)",
+      "type": "shell",
+      "command": "cmd.exe",
+      "args": ["/d", "/c", "if exist build rmdir /s /q build && if exist .cache rmdir /s /q .cache"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Configure (CMake preset Debug, fresh)",
+      "type": "shell",
+      "command": "cmake",
+      "args": ["--fresh", "--preset", "Debug"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Build (CMake preset Debug)",
+      "type": "shell",
+      "command": "cmake",
+      "args": ["--build", "--preset", "Debug"],
+      "problemMatcher": ["$gcc"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Build (CMake preset Debug, parallel 10)",
+      "type": "shell",
+      "command": "cmake",
+      "args": ["--build", "--preset", "Debug", "--parallel", "10"],
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "label": "Reconfigure + Build",
+      "dependsOrder": "sequence",
+      "dependsOn": ["Clean (delete build)", "Configure (CMake preset Debug, fresh)", "Build (CMake preset Debug)"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Flash (OpenOCD + DAPLink)",
+      "type": "shell",
+      "command": "C:\\Users\\32455\\Desktop\\daplink\\dap\\openocd-20240916\\OpenOCD-20240916-0.12.0\\bin\\openocd.exe",
+      "args": [
+        "-f",
+        "C:\\Users\\32455\\Desktop\\daplink\\dap\\daplink.cfg",
+        "-c",
+        "init",
+        "-c",
+        "reset halt",
+        "-c",
+        "program build/Debug/water.elf verify reset exit"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "Build + Flash",
+      "dependsOrder": "sequence",
+      "dependsOn": ["Build (CMake preset Debug, parallel 10)", "Flash (OpenOCD + DAPLink)"],
+      "problemMatcher": []
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CubeMX + Keil Assistant 工作流速查</title>
+  <link rel="stylesheet" href="../assets/lesson.css">
+</head>
+<body><main>
+  <h1>CubeMX + Keil Assistant 工作流速查</h1>
+  <p class="lead">一句话：父目录是完整工程，<code>MDK-ARM</code> 是它的 Keil 构建子工程。</p>
+
+  <div class="grid">
+    <section class="card safe">
+      <h2>你直接维护</h2>
+      <p><code>MDK-ARM/hardware</code><br><code>MDK-ARM/NVIC</code><br><code>MDK-ARM/system</code></p>
+      <p>业务状态机、设备驱动和协议逻辑放这里。</p>
+    </section>
+    <section class="card warn">
+      <h2>CubeMX 维护</h2>
+      <p><code>water.ioc</code><br><code>Core/Src</code><br><code>Core/Inc</code><br><code>Drivers</code></p>
+      <p>生成文件中的手写代码只能放在原有 USER CODE 区域。</p>
+    </section>
+  </div>
+
+  <h2>日常循环</h2>
+  <p class="flow">VS Code 编辑 → Keil Assistant Build → Download → 板上验证</p>
+
+  <h2>改硬件配置时</h2>
+  <ol>
+    <li>保存全部文件，并在完整工程根目录做一次版本提交或备份。</li>
+    <li>从父目录打开 <code>water.ioc</code>。</li>
+    <li>在 CubeMX 修改 Pinout、Clock、DMA、NVIC 或外设参数。</li>
+    <li>确认目标工具链仍为 MDK-ARM，打开 Keep User Code 和备份选项。</li>
+    <li>Generate Code。</li>
+    <li>检查 <code>main.c</code>、<code>tim.c</code>、<code>usart.c</code>、<code>gpio.c</code>、中断文件和 <code>water.uvprojx</code> 的变化。</li>
+    <li>确认 Keil 工程仍包含 hardware/NVIC/system 下的自定义源文件。</li>
+    <li>先 Rebuild，再 Download。</li>
+  </ol>
+
+  <h2>当前项目特别注意</h2>
+  <ul>
+    <li>父目录的 CMake 清单不完整，暂时不要把 CMake Build 当作发布固件来源。</li>
+    <li>只打开 <code>MDK-ARM</code> 时，父目录的 <code>.vscode</code> 配置不会生效。</li>
+    <li>只打开父目录时，需在 Keil Assistant 中手动选择 <code>MDK-ARM/water.uvprojx</code>。</li>
+    <li>原版 Keil Assistant 已停止维护；能稳定工作时可继续使用，迁移工具应单独安排，不要与业务改动同时进行。</li>
+  </ul>
+
+  <p>依据：<a href="https://www.st.com/resource/en/user_manual/dm00104712-stm32cubemx-for-stm32-configuration-and-initialization-c-code-generation-stmicroelectronics.pdf">STM32CubeMX UM1718</a>、<a href="https://github.com/github0null/keil-assistant">Keil Assistant 项目说明</a>。</p>
+</main></body>
+</html>
